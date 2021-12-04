@@ -7,7 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>登录 | Sign in</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css">
-    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="login.css">
+    <script src="common.js"></script>
     <script src="signin.js"></script>
 </head>
 <body>
@@ -19,9 +20,8 @@
                 <div>TODOList</div>
             </div>
             <div id="form">
-                <span class="key">账号：</span><input class="input" id="account" type="text" placeholder="邮箱或手机号">
+                <span class="key">账号：</span><input class="input" id="account" type="text" placeholder="手机号、邮箱或用户名">
                 <span class="key">密码：</span><input class="input" id="password" type="password" placeholder="请输入密码">
-                <span></span><span id="codeWrapper"><input type="text" class="input" id="textCode" placeholder="验证码"><span id="btnGetCode">验证码占位</span></span>
             </div>
             <div id="btnSubmit">登录账号</div>
         </div>

@@ -1,46 +1,62 @@
 document.onreadystatechange = function () {
     if (document.readyState === 'interactive') {
         //测试用例开始
-        document.getElementById('btnGetCode').onclick = function (){
-            document.getElementById('textCode').value = '160206';
-        }
-        document.getElementById('mainTitle').onclick = function (){
-            document.getElementById('accountName').value = 'Alex';
-            document.getElementById('email').value = 'email123@exmaple.com'
-            // document.getElementById('textCode').value
-            document.getElementById('phoneNumber').value = '13712345678';
-            document.getElementById('password').value = '@nlyY0uK0owTh1s';
-            document.getElementById('retypePassword').value = '@nlyY0uK0owTh1s';
-        }
         //测试用例结束
-        //基础功能开始
-        function addClass(obj, cls){
-            let obj_class = obj.className;//获取 class 内容.
-            obj_class += (obj_class !== '') ? ' ' : '';//判断获取到的 class 是否为空, 如果不为空在前面加个'空格'.
-            if(obj_class.indexOf(cls) === -1){
-                obj.className = obj_class + cls;//组合原来的 class 和需要添加的 class并替换原来的 class.
+
+        function watchDog(){
+            let watchDog = setInterval(function (){
+                let coolDownTime = getCoolDownTime();
+                if(coolDownTime === 0){
+                    document.getElementById('btnGetCode').innerText = '获取验证码';
+                    clearInterval(watchDog);
+                }
+                else {
+                    document.getElementById('btnGetCode').innerText = `重新获取(${coolDownTime}s)`;
+                }
+            },1000)
+        }
+
+        function getCoolDownTime(){
+            let last = getLS('last_get_time');
+            if(last === null){
+                return 0;
+            }
+            else{
+                let now = Math.floor((new Date().getTime()) / 1000);
+                return (now - last < 180) ? 180 - (now - last) : 0
+            }
+        }
+
+        function setCoolDownTime(){
+            let now = Math.floor((new Date().getTime())/1000);
+            setLS('last_get_time',now);
+        }
+
+        watchDog();
+        document.getElementById("btnGetCode").onclick = function (){
+            let phoneNumber = document.getElementById('phoneNumber').value;
+            if(getCoolDownTime() !== 0){}
+            else if(phoneNumber.length === 0){
+                showNotification('Fail',"请填写手机号");
+            }
+            else if(!/^[1][345789][0-9]{9}$/.test(phoneNumber)){
+                showNotification('Fail',"请填写合法的手机号");
+            }
+            else{
+                getData(`http://todoapi.mjclouds.com/v1/user/register/code/${phoneNumber}`)
+                    .then(json => {
+                        if (json['code'] === 2000){
+                            showNotification('Success', '验证码将发送到您的手机，请查收');
+                            setCoolDownTime();
+                            watchDog();
+                        }
+                        else{
+                            showNotification('Fail', json['message']);
+                        }
+                    });
             }
 
         }
-        function removeClass(obj, cls){
-            let obj_class = ' '+obj.className+' ';//获取 class 内容, 并在首尾各加一个空格. ex) 'abc    bcd' -> ' abc    bcd '
-            obj_class = obj_class.replace(/(\s+)/gi, ' ');//将多余的空字符替换成一个空格. ex) ' abc    bcd ' -> ' abc bcd '
-            let removed = obj_class.replace(new RegExp(' ' + cls + ' ', 'g'), ' ');//在原来的 class 替换掉首尾加了空格的 class. ex) ' abc bcd ' -> 'bcd '
-            removed = removed.replace(/(^\s+)|(\s+$)/g, '');//去掉首尾空格. ex) 'bcd ' -> 'bcd'
-            obj.className = removed;//替换原来的 class.
-        }
-        function hasClass(obj, cls){
-            let obj_class = obj.className;//获取 class 内容.
-            let obj_class_lst = obj_class.split(/\s+/);//通过split空字符将cls转换成数组.
-            let x = 0;
-            for(x in obj_class_lst) {
-                if(obj_class_lst[x] === cls) {//循环数组, 判断是否包含cls
-                    return true;
-                }
-            }
-            return false;
-        }
-        //基础功能结束
 
         document.getElementById('btnSubmit').onclick = function (){
             let input = {
@@ -51,52 +67,15 @@ document.onreadystatechange = function () {
                 password: document.getElementById('password').value,
                 retypePassword: document.getElementById('retypePassword').value,
             }
-            let result = checkInput(input);
-            if(result[0]){
-                showNotification('Success', result[1]);
-            }
-            else{
-                showNotification('Fail', result[1]);
-            }
-        }
-
-        let nCount = 0;
-        function showNotification(status,detail){
-            let ID = 'n' + (++nCount).toString();
-            document.getElementById('nWrapper').innerHTML
-                += `<div id="${ID}" class="nCommon nInactive n${status}">${detail}</div>`;
-            setTimeout(function (){
-                removeClass(document.getElementById(ID), 'nInactive');
-                addClass(document.getElementById(ID), 'nActive');
-            },0)
-            setTimeout(function() {
-                removeClass(document.getElementById(ID), 'nActive');
-                addClass(document.getElementById(ID), 'nInactive');
-            }, 3000);
-            setTimeout(function() {
-                document.getElementById(ID).remove();
-            }, 3600);
-
-        }
-
-        function highlight(key){
-            addClass(document.getElementById(key),'inputInvalid');
-            document.getElementById(key).onfocus = function (){
-                removeClass(document.getElementById(key), 'inputInvalid')
-            }
-        }
-
-        function checkInput(input){
             let isEmpty = 0;
             for(let key in input){
-                // console.log(key + "：" + document.getElementById(key).value);
                 if(input[key].length === 0){
                     isEmpty += 1;
                     highlight(key);
                 }
             }
             if(isEmpty){
-                return [false,'还有未填写的字段'];
+                showNotification('Fail','还有未填写的字段');
             }
             else{
                 let errDetail = '';
@@ -113,7 +92,7 @@ document.onreadystatechange = function () {
                     errDetail += `<div>请输入合法的验证码</div>`;
                     invalid++;
                 }
-                if(!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(input['phoneNumber'])){
+                if(!/^[1][345789][0-9]{9}$/.test(input['phoneNumber'])){
                     errDetail += `<div>请输入正确的手机号</div>`
                     invalid++;
                 }
@@ -134,13 +113,60 @@ document.onreadystatechange = function () {
                     }
                 }
                 if(invalid){
-                    return [false, errDetail];
+                    showNotification('Fail', errDetail);
                 }
                 else{
-                    return [true, 'Go ahead signup.'];
+                    getData(`http://todoapi.mjclouds.com/v1/user/check/email/${input['email']}`)
+                        .then(json => {
+                            if (json['code'] !== 2000){
+                                showNotification('Fail', json['message']);
+                            }
+                            else {
+                                doRegister(input['accountName'], input["password"], input['email'], input['phoneNumber'], input['textCode'])
+                                    .then(json => {
+                                        if (json['code'] === 2000){
+                                            showNotification('Success', '注册成功，将自动登录');
+                                            doLogin(input["phoneNumber"], input['password']).then(json => {
+                                                setLS('token', json['data'][0]['token']);
+                                                console.log(json['data'][0]['token']);
+                                                location.href = './index.html';
+                                            })
+                                        }
+                                        else{
+                                            showNotification('Fail', json['message']);
+                                        }
+                                    })
+                            }
+                        });
                 }
 
             }
+        }
+
+        async function doRegister(user_name, password, email, phone, code){
+            return fetch("https://todoapi.mjclouds.com/v1/user/register", {
+                method: 'POST',
+                body: JSON.stringify({
+                    user_name,
+                    password,
+                    email,
+                    phone,
+                    code
+                }),
+                redirect: 'follow'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        showNotification('Fail', '返回了不正常的http状态码');
+                        throw new Error('Network response was not OK');
+                    }
+                    else{
+                        return response.json();
+                    }
+                }).catch(e => {
+                    showNotification('Fail', e);
+                    throw new Error(e)
+                })
         }
     }
 }
