@@ -129,7 +129,7 @@ document.onreadystatechange = function () {
                                             doLogin(input["phoneNumber"], input['password']).then(json => {
                                                 setLS('token', json['data'][0]['token']);
                                                 console.log(json['data'][0]['token']);
-                                                location.href = './index.html';
+                                                location.href = 'app.html';
                                             })
                                         }
                                         else{

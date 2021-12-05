@@ -88,7 +88,7 @@ async function getData(url){
             }
         }).catch(e => {
             showNotification('Fail', e);
-            throw new Error(e)
+            throw new Error(e);
         });
 }
 

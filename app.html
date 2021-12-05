@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-ch">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>TODOList</title>
+    <link href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css" rel="stylesheet">
+    <link href="app.css" rel="stylesheet">
+    <script src="common.js"></script>
+</head>
+<body>
+<div id="wrapper">
+    <div id="bannerWrapper">
+        <span class="mainTitle" id="mainTitle">TODOList</span>
+        <span id="userTitle">RainChen_</span>
+    </div>
+    <div id="categoryWrapper">
+        <span class="category catSelected" id="catTodo">未开始</span>
+        <span class="category" id="catDoing">进行中</span>
+        <span class="category" id="catDone">已完成</span>
+    </div>
+    <div class="pageTodo" id="scrollWrapper">
+        <div class="todoSection activeSection" id="todoWrapper"></div>
+        <div class="todoSection" id="doingWrapper"></div>
+        <div class="todoSection" id="doneWrapper"></div>
+    </div>
+    <div id="addWrapper"></div>
+    <script src="app.js"></script>
+</div>
+</body>
+</html>
