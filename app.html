@@ -8,13 +8,14 @@
     <title>TODOList</title>
     <link href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css" rel="stylesheet">
     <link href="app.css" rel="stylesheet">
+    <link href="common.css" rel="stylesheet">
     <script src="common.js"></script>
 </head>
 <body>
 <div id="wrapper">
-    <div id="bannerWrapper">
+    <div class="banner" id="bannerWrapper">
         <span class="mainTitle" id="mainTitle">TODOList</span>
-        <span id="userTitle">RainChen_</span>
+        <span class="subTitle" id="userTitle">RainChen_</span>
     </div>
     <div id="categoryWrapper">
         <span class="category catSelected" id="catTodo">未开始</span>
@@ -26,8 +27,27 @@
         <div class="todoSection" id="doingWrapper"></div>
         <div class="todoSection" id="doneWrapper"></div>
     </div>
-    <div id="addWrapper"></div>
-    <script src="app.js"></script>
+    <div id="addBtnWrapper">
+        <div id="btnAdd">新增事项</div>
+    </div>
 </div>
+<div class="addWrapper" id="addWrapper">
+    <div id="addMainWrapper">
+        <div class="banner" id="addBannerWrapper">
+            <div class="mainTitle" id="addMainTitle">添加事项</div>
+            <div class="subTitle" id="addCtrlClose">关闭</div>
+        </div>
+        <div id="addFormWrapper">
+            <input id="addTodoTitle" placeholder="输入标题" type="text">
+            <textarea id="addTodoDescription" placeholder="如果有描述，请输入"></textarea>
+            <input id="addTodoTime" placeholder="可以输入结束时间" type="datetime-local">
+        </div>
+        <div id="addAddWrapper">
+            <div id="addBtnSubmit">完成</div>
+        </div>
+    </div>
+</div>
+<div id="nWrapper"></div>
+<script src="app.js"></script>
 </body>
 </html>

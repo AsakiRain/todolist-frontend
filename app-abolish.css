@@ -80,14 +80,17 @@ html, body {
         left: 0;
         right: 0;
     }
-    .leftSection{
+
+    .leftSection {
         left: -100vw;
         right: 100vw;
     }
-    .rightSection{
+
+    .rightSection {
         left: 100vw;
         right: -100vw;
     }
+
     .activeSection {
         left: 0;
         right: 0;
