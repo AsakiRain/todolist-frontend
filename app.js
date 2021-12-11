@@ -1,8 +1,3 @@
-function sw() {
-    window.open(`./app.html`,
-        '', 'width=411,height=823');
-}
-
 let token = getLS('token');
 if (token === null) {
     location.href = './signin.html';
@@ -10,18 +5,41 @@ if (token === null) {
     getTodo();
 }
 
-document.getElementById('userTitle').onclick = function () {
-    showNotification('Success', document.getElementById('userTitle').innerHTML);
+document.getElementById('mainTitle').onclick = sw;
+
+document.getElementById('btnLogout').onclick = function () {
+    funcLogout();
 }
 
 document.getElementById('catTodo').onclick = function () {
     selectCat('Todo');
 }
+
 document.getElementById('catDoing').onclick = function () {
     selectCat('Doing');
 }
+
 document.getElementById('catDone').onclick = function () {
     selectCat('Done');
+}
+
+function sw() {
+    window.open(`./app.html`,
+        '', 'width=411,height=823');
+}
+
+function funcLogout() {
+    document.getElementById('userTitle').innerHTML = `<span id="btnConfirmLogout">确定</span>&nbsp&nbsp<span id="btnCancel">取消</span>`;
+    document.getElementById('btnConfirmLogout').onclick = function () {
+        removeLS('token');
+        location.href = './signin.html'
+    }
+    document.getElementById('btnCancel').onclick = function () {
+        document.getElementById('userTitle').innerHTML = `<span id="btnLogout">登出</span>`;
+        document.getElementById('btnLogout').onclick = function () {
+            funcLogout();
+        }
+    }
 }
 
 let selected = 'Todo';
@@ -144,7 +162,7 @@ function funcMove(ele) {
     let status = parent.getAttribute('todo-status');
     parent.children[0].innerHTML = '<span>返回</span>';
     parent.children[0].onclick = function () {
-        funcShow(parent);
+        funcShow(this.parentNode);
     }
     let pos = 1;
     for (let i in moveAlias) {
@@ -162,10 +180,25 @@ function funcMove(ele) {
 }
 
 function funcEdit(ele) {
-
+    showNotification('Success', '没有支持这个功能');
 }
 
 function funcDelete(ele) {
+    let parent = ele.parentNode;
+    parent.children[0].innerHTML = '<span>请确认</span>';
+    parent.children[1].innerHTML = '<span>确认</span>';
+    parent.children[2].innerHTML = '<span>取消</span>';
+    parent.children[0].onclick = function () {
+    };
+    parent.children[1].onclick = function () {
+        deleteTodo(this);
+    }
+    parent.children[2].onclick = function () {
+        funcShow(this.parentNode);
+    }
+}
+
+function deleteTodo(ele) {
     let parent = ele.parentNode;
     let todoID = parent.getAttribute('todo-id');
     fetch(`http://todoapi.mjclouds.com/v1/todo/del/${todoID}`, {
@@ -203,7 +236,6 @@ function moveTodo(ele) {
     let parent = ele.parentNode;
     let moveTo = ele.getAttribute('move-to');
     let todoID = parent.getAttribute('todo-id');
-    console.log(`ID为${todoID}的节点${parent}将被移动到"${moveAlias[moveTo]}"`);
     fetch(`http://todoapi.mjclouds.com/v1/todo/${moveEng[moveTo]}/${todoID}`, {
         headers: {
             'token': token,
