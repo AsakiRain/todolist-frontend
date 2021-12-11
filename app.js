@@ -229,8 +229,8 @@ function moveTodo(ele) {
     });
 }
 
-function getDate(date){
-    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T${('0' + date.getHours()).substr(-2)}:${date.getMinutes()}`;
+function getDate(date) {
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T${('0' + date.getHours()).substr(-2)}:${('0' + date.getMinutes()).substr(-2)}`;
 }
 
 document.getElementById('btnAdd').onclick = function () {
@@ -244,15 +244,52 @@ document.getElementById('addCtrlClose').onclick = function () {
     removeClass(document.getElementById('wrapper'), 'wrapperInactive');
 }
 
-document.getElementById('addBtnSubmit').onclick = function(){
+document.getElementById('addBtnSubmit').onclick = function () {
     funcAdd()
 }
+
 function funcAdd() {
-    let todoTitle = document.getElementById('addTodoTitle').value;
-    let todoDescription = document.getElementById('addTodoDescription').value;
-    let todoTime = document.getElementById('addTodoTime').value;
-    if(todoTitle === ''){
+    let todoName = document.getElementById('addTodoTitle').value;
+    let description = document.getElementById('addTodoDescription').value;
+    let endTime = document.getElementById('addTodoTime').value;
+    if (todoName === '') {
         highlight('addTodoTitle');
         showNotification('Fail', '请输入标题');
+    } else {
+        fetch(`http://todoapi.mjclouds.com/v1/todo/add`, {
+            headers: {
+                'token': token,
+            },
+            body: JSON.stringify({
+                "todo_name": todoName,
+                "description": description === '' ? 'some desc' : description,
+                "end_time": Math.round(new Date(Date.parse(endTime)) / 1000),
+            }),
+            redirect: 'follow',
+            method: 'PUT',
+        }).then(response => {
+            if (!response.ok) {
+                showNotification('Fail', `返回了不正常的http状态码：${response.status}`);
+                throw new Error('Network response was not OK');
+            } else {
+                return response.json();
+            }
+        }).then(json => {
+            if (json['code'] !== 2000) {
+                showNotification('Fail', json['message']);
+            } else {
+                getTodo();
+                showNotification('Success', '添加成功');
+                removeClass(document.getElementById('addWrapper'), 'addWrapperActive');
+                removeClass(document.getElementById('wrapper'), 'wrapperInactive');
+                document.getElementById('addTodoTitle').value = '';
+                document.getElementById('addTodoDescription').value = '';
+                document.getElementById('addTodoTime').value = '';
+
+            }
+        }).catch(e => {
+            showNotification('Fail', e);
+            throw new Error(e);
+        });
     }
 }
